@@ -24,7 +24,7 @@ class InvalidInputException(Exception):
 
 class TreeNode:
 
-    def __init__(self, parent, value) : #TODO
+    def __init__(self, parent, value):
         """
         Input: Node (implicit argument), parent: Node, value: anything
         Output: a Node with a parent node and a value
@@ -33,6 +33,7 @@ class TreeNode:
         self.n_parent = parent
         self.n_value = value
         self.payoffs = None
+        
         # Store as "(player, infset)"
         self.information_set = (None,None)
         self.n_children = []
@@ -50,7 +51,7 @@ class TreeNode:
     def set_payoffs(self, new_payoffs):
         self.payoffs = new_payoffs
         
-    def parent(self): #TODO
+    def parent(self):
         """
         Input: Node (implicit argument)
         Output: Node
@@ -68,7 +69,7 @@ class TreeNode:
         """
         return self.n_children
 
-    def addChild(self, value) : #TODO
+    def addChild(self, value):
         """
         Input: Node (implicit argument), value: anything
         Output: Node
@@ -78,7 +79,7 @@ class TreeNode:
         self.n_children.append(child)
         return child
     
-    def hasChildren(self): #TODO
+    def hasChildren(self):
         """
         Input: Node (implicit argument)
         Output: boolean
@@ -88,7 +89,7 @@ class TreeNode:
             return True
         return False
     
-    def value(self): #TODO
+    def value(self):
         """
         Input: Node (implicit argument)
         Output: anything
@@ -96,7 +97,7 @@ class TreeNode:
         """
         return self.n_value
     
-    def depth(self): #TODO
+    def depth(self):
         """
         Input: Node (implicit argument)
         Output: int
@@ -133,7 +134,7 @@ class Tree:
     Date: 4 Mar 2018
     """
 
-    def __init__(self) : #TODO
+    def __init__(self):
         """
         Input: Tree (implicit argument)
         Output: Tree
@@ -143,7 +144,7 @@ class Tree:
         self.t_size = 0
         self.t_height = 0
                 
-    def root(self):  #TODO
+    def root(self): 
         """
         Input: Tree (implicit argument)
         Output: Node
@@ -155,7 +156,7 @@ class Tree:
 
         return self.t_root
             
-    def parent(self, node): #TODO
+    def parent(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: Node
@@ -167,7 +168,7 @@ class Tree:
 
         return node.n_parent
             
-    def children(self, node): #TODO
+    def children(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: List of child nodes
@@ -198,7 +199,7 @@ class Tree:
                     out.append(child)
         return out
     
-    def isEmpty(self): #TODO
+    def isEmpty(self):
         """
         Input: Tree (implicit argument)
         Output: boolean
@@ -208,7 +209,7 @@ class Tree:
             return True
         return False
     
-    def size(self): #TODO
+    def size(self):
         """
         Input: Tree (implicit argument)
         Output: int
@@ -216,7 +217,7 @@ class Tree:
         """
         return self.t_size
 
-    def height(self): #TODO
+    def height(self):
         """
         Input: Tree (implicit argument)
         Output: int
@@ -228,7 +229,7 @@ class Tree:
 
         return self.t_height
 
-    def isInternal(self, node): #TODO
+    def isInternal(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: boolean
@@ -243,7 +244,7 @@ class Tree:
                 return True
         return False
 
-    def isExternal(self, node): #TODO
+    def isExternal(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: boolean
@@ -259,7 +260,7 @@ class Tree:
             return True
         return False
 
-    def isRoot(self, node): #TODO
+    def isRoot(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: boolean
@@ -273,7 +274,7 @@ class Tree:
             return True
         return False
 
-    def hasChildren(self, node): #TODO
+    def hasChildren(self, node):
         """
         Input: Tree (implicit argument), node: Node
         Output: boolean
@@ -285,7 +286,7 @@ class Tree:
 
         return node.n_children is not []
 
-    def addRoot(self, e): #TODO
+    def addRoot(self, e):
         """
         Input: Tree (implicit argument), e: anything
         Output: Node (the root node)
@@ -297,7 +298,7 @@ class Tree:
             self.t_size += 1
         return self.t_root
 
-    def addChild(self, node, e): #TODO
+    def addChild(self, node, e):
         """
         Input: Tree (implicit argument), node: Node, e: anything
         Output: the right child of the node
