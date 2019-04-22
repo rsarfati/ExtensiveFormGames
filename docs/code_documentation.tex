@@ -1,0 +1,410 @@
+\documentclass[11pt]{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsthm}
+
+% Encoding
+\usepackage[utf8]{inputenc}
+
+% Graphics, figures and plots
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+
+% Etc
+\usepackage{authblk}
+\usepackage{hyperref}
+\usepackage{xifthen}
+\usepackage{verbatim} % Multiline comments with \begin{comment} and \end{comment}
+\usepackage[inline,shortlabels]{enumitem} % Control vertical spacing: \begin{itemize}[noitemsep]
+%\setlist{nolistsep} % No vertical space before \begin{itemize}
+\usepackage{csquotes} % for block quotes
+
+% Bibliography
+\usepackage{natbib}
+
+% Math
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amscd}
+\usepackage{eurosym}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{dsfont}
+\usepackage{blkarray, bigstrut}
+\usepackage{bm} % defines a command \bm which makes its argument bold
+\usepackage{bbm}
+\usepackage{nicefrac}
+
+% Pseudocode
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+%\allowdisplaybreaks
+% Use chapter/section numbers with tufte-handout
+\setcounter{secnumdepth}{2}
+% Margin notes for math mode
+\def\mathnote#1{%
+    \tag*{\rlap{\hspace\marginparsep\smash{\parbox[t]{\marginparwidth}{%
+    \footnotesize#1}}}}
+}
+
+%%%% Mathematical Environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem-anon}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem*{lemma-anon}{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{note}[theorem]{Note}
+\newtheorem{case}[theorem]{Case}
+
+%%%%%%%%%%
+% Operators
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\Exp}{\mathbb{E}}
+\DeclareMathOperator*{\Var}{\text{Var}}
+\DeclareMathOperator*{\Cov}{\text{Cov}}
+
+%%%%%%%%%%
+% Paired -- \command* will automatically resize
+\DeclarePairedDelimiter\paren{(}{)}           % (parentheses)
+\DeclarePairedDelimiter\ang{\langle}{\rangle} % <angle brackets>
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}   % |absolute value|
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}  % ||norm||
+\DeclarePairedDelimiter\bkt{[}{]}             % [brackets]
+\DeclarePairedDelimiter\set{\{}{\}}           % {braces}
+%
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+%%%%%%%%%%
+% Number sets
+\newcommand{\nsNatural}{\mathbb{N}} % Try to avoid.  Ambiguity if 0 is included.
+\newcommand{\nsInteger}{\mathbb{Z}}
+\newcommand{\nsRational}{\mathbb{Q}}
+\newcommand{\nsReal}{\mathbb{R}}
+\newcommand{\nsImaginary}{\mathbb{I}}
+\newcommand{\nsComlex}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Fields %%%
+\title{Sequence Form Solver Documentation and Test Cases}
+\author{Reca Sarfati}
+\date{March 2018}
+
+\begin{document}
+\maketitle
+
+%%% Section 1
+\setcounter{section}{0}
+\section{Code Explained}
+The file \verb|sequence_form.py| contains the following main methods: \\ \begin{itemize}[-]
+    \item \verb|decorate_sequences(bt)| \\
+    This function consumes a tree, and performs a breadth-first search so as to decorate each node with the unique sequences of player 1 and player 2's movement decisions from the root to itself. A decision is encoded as the index of the child, enumerating from left to right. (For example, if a given node has two children, and the sequence elects to move to the leftmost child, a `0' is stored). The method then returns a list of nodes.
+    
+    \item \verb|extensive_to_strategic_form(game)| \\ As it sounds, this method intakes a decorated game, and populates the $A$ and $B$ matrices, corresponding to players' payoff  matrices.
+    
+    \item \verb|extensive_to_sequence_form(game)| \\ This method, similarly, intakes a decorated game, and returns the $A,B,E,F,e,f,$ matrices.
+    
+    \item \verb|solve_strategic_form(game)| \\ This method computes player 1's strategy for inputted strategic form matrices $A,B$.
+    
+    \item \verb|solve_strategic_form(game)| \\ This method computes player 1's strategy for inputted strategic form matrices $A,B$.
+    
+    \item \verb|solve_strategic_form(game)| \\ This method computes player 1's strategy for inputted sequence form matrices $A,B,E,F,e,f$.
+\end{itemize} 
+
+ The file \verb|sequence_form_test.py| contains various named tests, annotated in the ensuing pages.
+
+\newpage
+\setcounter{section}{1}
+\section{Tests}
+\subsection{Von Stengel Test}
+In this test, we solve the same tree as in the paper:
+    \footnote{Colored blocks indicate information sets, where 1 implies player A's turn, and 2 implies player B's.} 
+\\[6pt]
+\begin{center}
+    \includegraphics[width=4cm]{von_stengel_test.png}
+\end{center}
+The associated payoff matrices for players A and B are as follows:\\[6pt]
+\begin{tabular}{p {4cm} c c}
+     {$\displaystyle
+        A = \begin{blockarray}{c c c c}
+            \varnothing & l & r \\
+            \begin{block}{[c c c] c}
+                &   &   & \varnothing \\
+                &   &   & L \\
+              3 &   &   & R \\
+                & 2 & 5 & LS \\
+                & 0 & 6 & LT \\
+            \end{block}
+            \end{blockarray}$} &
+        {$B = \begin{blockarray}{c c c c}
+                \varnothing & l & r \\
+                \begin{block}{[c c c] c}
+                    &   &   & \varnothing \\
+                    &   &   & L \\
+                  3 &   &   & R \\
+                    & 2 & 6 & LS \\
+                    & 3 & 1 & LT \\
+                \end{block}
+                \end{blockarray}
+    $}
+\end{tabular}
+
+The associated constraint matrices are as follows: \\[12pt]
+
+$ E = \begin{blockarray}{c c c c c}
+            \varnothing & L & R & LS & LT \\
+            \begin{block}{[c c c c c]}
+                1 &    &   &   & \\
+               -1 & 1  & 1 &   & \\
+                  & -1 &   & 1 & 1 \\
+            \end{block}
+            \end{blockarray},\quad\quad
+    e = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+                0 \\
+            \end{blockarray}
+$
+\newline
+$
+    F = \begin{blockarray}{c c c}
+            \varnothing & l & r \\
+            \begin{block}{[c c c]}
+                1 &    &    \\
+               -1 & 1  & 1 \\
+            \end{block}
+            \end{blockarray}, \quad\quad
+    f = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+            \end{blockarray}
+$
+\newpage
+\subsection{Test 2: Three Branches, Unbalanced}
+In this test, we solve the following zero-sum game:
+\\[6pt]
+\begin{center}
+    \includegraphics[width=7cm]{test2.png}
+\end{center}
+The associated payoff matrices for players A and B are as follows:\\[6pt]
+\begin{tabular}{p {4.5cm} c c}
+     {$\displaystyle
+        A = \begin{blockarray}{c c c c c}
+            \varnothing & l & r & m\\
+            \begin{block}{[c c c c] c}
+                &   &   & & \varnothing \\
+              1 &   &   & & L \\
+                &   & 4 & & R \\
+                & 2 &  &  & RS \\
+                & 3 &  & & RT \\
+                &  &  &5 & RU \\                
+            \end{block}
+            \end{blockarray}$} &
+        {$B = \begin{blockarray}{c c c c c}
+                \varnothing & l & r & m\\
+                \begin{block}{[c c c c] c}
+                    &   &    & & \varnothing \\
+                 -1 &   &    & & L \\
+                    &   & -4 & & R \\
+                    & -2 &  &  & RS \\
+                    & -3 &  & & RT \\
+                    &  &  & -5& RU \\
+                \end{block}
+                \end{blockarray}
+    $}
+\end{tabular}
+
+The associated constraint matrices are as follows: \\[12pt]
+
+$ E = \begin{blockarray}{c c c c c c}
+            \varnothing & L & R & RS & RT & RU\\
+            \begin{block}{[c c c c c c]}
+                1 &    &   &   & \\
+               -1 & 1  & 1 &   & \\
+                  &  &  -1 & 1 & 1 \\
+                  &  &  -1 &  & & 1 \\
+            \end{block}
+            \end{blockarray},\quad\quad
+    e = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+                0 \\
+            \end{blockarray}
+$
+\newline
+$
+    F = \begin{blockarray}{c c c c}
+            \varnothing & l & r & m\\
+            \begin{block}{[c c c c]}
+                1 &    &   & \\
+               -1 & 1  & 1 & 1 \\
+            \end{block}
+            \end{blockarray}, \quad\quad
+    f = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+            \end{blockarray}
+$
+\newpage
+\subsection{Test 3: Complete Binary Tree, Depth 3}
+In this test, we solve the following zero-sum game on a complete binary tree:
+\\[6pt]
+\begin{center}
+    \includegraphics[width=7cm]{test3.png}
+\end{center}
+The associated payoff matrices for players A and B are as follows:\\[6pt]
+\begin{tabular}{p {4.5cm} c c}
+     {$\displaystyle
+        A = \begin{blockarray}{c c c c}
+            \varnothing & l & r\\
+            \begin{block}{[c c c] c}
+               &   &  & \varnothing \\
+               &   &  & L \\
+               &   &  & R \\
+               & 1 & 3 & LS \\
+               & 2 & 4 & LT \\
+               & 5 & 7 & RS \\
+               & 6 & 8 & RT \\
+            \end{block}
+            \end{blockarray}$} &
+        {$B = \begin{blockarray}{c c c c}
+                \varnothing & l & r\\
+                \begin{block}{[c c c] c}
+               &   &  & \varnothing \\
+               &   &  & L \\
+               &   &  & R \\
+               & -1 & -3 & LS \\
+               & -2 & -4 & LT \\
+               & -5 & -7 & RS \\
+               & -6 & -8 & RT \\
+                \end{block}
+                \end{blockarray}
+    $}
+\end{tabular}
+
+The associated constraint matrices are as follows: \\[12pt]
+
+$ E = \begin{blockarray}{c c c c c c c}
+            \varnothing & L & R & LS & LT & RS & RT \\
+            \begin{block}{[c c c c c c c]}
+                1 &    &   &   &  &  &\\
+               -1 & 1  & 1 &   &  &  &\\
+                  & -1 &   & 1 & 1   & \\
+                  &    &-1 &   &  & 1 & 1 \\
+            \end{block}
+            \end{blockarray},\quad\quad
+    e = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+                0 \\
+                0 \\
+            \end{blockarray}
+$
+\newline
+$
+    F = \begin{blockarray}{c c c}
+            \varnothing & l & r\\
+            \begin{block}{[c c c]}
+                1 &    &  \\
+               -1 & 1  & 1 \\
+            \end{block}
+            \end{blockarray}, \quad\quad
+    f = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+            \end{blockarray}
+$
+\newpage
+\subsection{Test 4: Highly Uneven Tree, Depth 5}
+In this test, we solve the following zero-sum game on a highly uneven tree:
+\\[6pt]
+\begin{center}
+    \includegraphics[width=7cm]{test4.png}
+\end{center}
+The associated payoff matrices for players A and B are as follows:\\[6pt]
+$
+        A = \begin{blockarray}{c c c c c c c c c}
+            \varnothing & l & r & o & m & lh & oj & oq\\
+            \begin{block}{[c c c c c c c c] c}
+               & & & & & & &  &\varnothing \\
+               & &3& &7& & &  &L \\
+             8 & & & & & & &  &R \\
+               &1& & & && &  &LS \\
+               &-1& && & & &  &LT \\
+               & & & & & 2& &  &LU \\
+               & & & & &  &4&  &LV \\
+               && &6& & & &  &LW \\  
+               & & & & & & & 5&LVD \\
+               & & & & & & & -5&LVG \\
+            \end{block}
+            \end{blockarray}$
+\\
+$B = \begin{blockarray}{c c c c c c c c c}
+            \varnothing & l & r & o & m & lh & oj & oq\\
+            \begin{block}{[c c c c c c c c] c}
+               & & & & & & &  &\varnothing \\
+               & &-3& &-7& & &  &L \\
+             -8 & & & & & & &  &R \\
+               &-1& & & && &  &LS \\
+               &1& && & & &  &LT \\
+               & & & & & -2& &  &LU \\
+               & & & & &  &-4&  &LV \\
+               && &-6& & & &  &LW \\  
+               & & & & & & & -5&LVD \\
+               & & & & & & & 5&LVG \\
+            \end{block}
+            \end{blockarray}$
+
+The associated constraint matrices are as follows:
+$$ E = \begin{blockarray}{c c c c c c c c c c c}
+            \varnothing & L & R & LS & LT & LU & LV & LW & LVD & LVG \\
+            \begin{block}{[c c c c c c c c c c c]}
+                1 &    &   &   &  &&  &\\
+               -1 & 1  & 1 &  &  & & &\\
+                  & -1 &   &  1 & 1 & 1   & \\
+                  & -1 & & &   &  & 1 & 1 \\
+                  &  & & &   &  & -1 & & 1& 1 \\
+            \end{block}
+            \end{blockarray},\quad
+        e = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+                0 \\
+                0 \\
+            \end{blockarray}
+$$
+\newline
+$
+    F = \begin{blockarray}{c c c c c c c c c}
+            \varnothing & l & r & o & m & lh & oj & oq \\
+            \begin{block}{[c c c c c c c c c]}
+                1 &    &  \\
+               -1 & 1  & 1 & 1 & 1 & \\
+                & -1 & & & & 1 \\
+                & & & -1 & & & 1 & 1 \\
+            \end{block}
+            \end{blockarray}, \quad\quad
+    f = \begin{blockarray}{[c]}
+                1 \\
+                0 \\
+                0 \\
+                0 \\
+            \end{blockarray}
+$
+\end{document}
