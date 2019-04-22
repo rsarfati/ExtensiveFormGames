@@ -30,7 +30,7 @@ class Game:
     def __str__(self):
         """
         Input: Game (implicit argument)
-        Output: String representation of BinTree
+        Output: String representation of Game
         Purpose: printing
         """
         toReturn = 'Num. Players: ' + str(self.n_players) + '\n'

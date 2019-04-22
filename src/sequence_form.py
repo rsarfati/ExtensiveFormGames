@@ -6,7 +6,7 @@ from tree import *
 import queue
 import itertools as it
 from scipy.optimize import linprog
-import lemkelcp as lcp
+#import lemkelcp as lcp
 
 def extensive_to_strategic_form(game):
 	''' 
@@ -18,7 +18,7 @@ def extensive_to_strategic_form(game):
 	bt = game.tree
 
 	if (n_players != 2):
-		raise IOError('This implementation is not going to work without 2 players.')
+		raise IOError('In its present state, this implementation is not going to work without 2 players.')
 
 	root = bt.root()
 	depth = bt.height()
