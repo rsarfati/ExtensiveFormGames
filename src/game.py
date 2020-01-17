@@ -1,3 +1,5 @@
+from copy import *
+from queue import Queue
 class Game:
 
     def __init__(self, num_players, tree) :
@@ -62,16 +64,22 @@ class Node:
             self.n_depth = parent.depth()        + 1
             
             # Maps players to the sequences getting them to node
-            self.n_sequences = parent.n_sequences
-
+            self.n_sequences = deepcopy(parent.get_sequences())
+            
             # The parent node's action got you here
-            self.n_sequences[parent.n_player].append(self.n_id)
+            if parent.n_player not in self.n_sequences.keys():
+                self.n_sequences[parent.n_player] = [self.n_id]
+            else:
+                self.n_sequences[parent.n_player].append(self.n_id)
 
-    def set_information_set(self, player, inf_set):
-        self.information_set = (player, inf_set)
+    def set_information_set(self, inf_set):
+        self.information_set = inf_set
 
     def set_payoffs(self, new_payoffs):
         self.payoffs = new_payoffs
+
+    def get_sequences(self):
+        return self.n_sequences
         
     def parent(self):
         """
@@ -272,7 +280,7 @@ class GameTree:
         if node is None or child is None:
             raise InvalidInputException("Input is None")
 
-        for node_child in node.children():
+        for node_child in node.get_children():
             if child == node_child:
                 return True
 
@@ -324,7 +332,7 @@ class GameTree:
     
         while not Q.empty():
             node = Q.get()
-            for child in node.children():
+            for child in node.get_children():
                 Q.put(child)
                 qlist.append(child)
 
@@ -355,7 +363,7 @@ class GameTree:
         output = []
         node_list = self.nodes()
         for node in node_list:
-            if is_leaf(node):
+            if self.is_leaf(node):
                 output.append(node)
         return output
 
