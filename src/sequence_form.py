@@ -2,7 +2,7 @@
 import numpy as np
 import traversals
 from game import *
-from tree import *
+from numpy import array, zeros, unique
 import queue
 import itertools as it
 from scipy.optimize import linprog
@@ -18,7 +18,7 @@ def extensive_to_strategic_form(game):
 	bt = game.tree
 
 	if (n_players != 2):
-		raise IOError('In its present state, this implementation is not going to work without 2 players.')
+		raise IOError('In its present state, this implementation is not going to work w/o 2 players.')
 
 	root = bt.root()
 	depth = bt.height()
@@ -40,8 +40,8 @@ def extensive_to_strategic_form(game):
 	a_strategies = list(it.product(*[list(a_moves[inf]) for inf in a_moves.keys()]))
 	b_strategies = list(it.product(*[list(b_moves[inf]) for inf in b_moves.keys()]))
 
-	A = np.zeros((len(a_strategies), len(b_strategies)))
-	B = np.zeros((len(a_strategies), len(b_strategies)))
+	A = zeros((len(a_strategies), len(b_strategies)))
+	B = zeros((len(a_strategies), len(b_strategies)))
 
 	for i in range(A.shape[0]):
 		for j in range(B.shape[1]):
@@ -147,7 +147,8 @@ def solve_strategic_form(aMatrix, bMatrix):
 
 	#print(obj)
 
-	result = linprog(obj, A_eq=A_eq, b_eq=b_eq, A_ub=A_lb, b_ub = b_lb, bounds=bounds, options={"disp": True})
+	result = linprog(obj, A_eq=A_eq, b_eq=b_eq, A_ub=A_lb, b_ub = b_lb, bounds=bounds, 
+		options={"disp": True})
 
 	print(result)
 
@@ -158,21 +159,22 @@ def solve_sequence_form(A,B,E,F,e,f):
 
 	# Pads zeros onto /columns/
 	c = - np.pad(f.T, ((0,0),(0, x_len)), mode='constant').T
-	add_to_one = np.concatenate([np.zeros(v_len), np.ones(x_len)], axis=0)
+	add_to_one = np.concatenate([zeros(v_len), np.ones(x_len)], axis=0)
 	A_eq = np.pad(E, ((0,0),(v_len, 0)), mode='constant')
 	b_eq = e
 
 	A_ub = (np.pad(F.T, ((0,0),(0, x_len)), mode='constant') - \
 			np.pad(A.T, ((0,0),(v_len, 0)), mode='constant'))
 
-	b_ub = np.zeros(A_ub.shape[0])
+	b_ub = zeros(A_ub.shape[0])
 
 	vBound = (None, None)
 	xBound = (0, None)
 	bounds = [vBound] * v_len + [xBound] * x_len
 	bounds = tuple(bounds)
 
-	result = linprog(c, A_eq=A_eq, b_eq=b_eq, A_ub=A_ub, b_ub = b_ub, bounds=bounds, method='interior-point',options={"disp": True})
+	result = linprog(c, A_eq=A_eq, b_eq=b_eq, A_ub=A_ub, b_ub = b_ub, bounds=bounds, 
+		method='interior-point',options={"disp": True})
 
 	print("===== PLAYER 1 =====")
 	print(result)
@@ -277,11 +279,11 @@ def extensive_to_sequence_form(game):
 
 	nodes = decorate_sequences(bt)
 
-	A_sequences = np.array(sorted(np.unique(np.array([node.sequence_a for node in nodes])), key=len))
-	B_sequences = np.array(sorted(np.unique(np.array([node.sequence_b for node in nodes])), key=len))
+	A_sequences = array(sorted(unique(array([node.sequence_a for node in nodes])), key=len))
+	B_sequences = array(sorted(unique(array([node.sequence_b for node in nodes])), key=len))
 
-	A = np.zeros((A_sequences.size, B_sequences.size))
-	B = np.zeros((A_sequences.size, B_sequences.size))
+	A = zeros((A_sequences.size, B_sequences.size))
+	B = zeros((A_sequences.size, B_sequences.size))
 
 	for i in range(A.shape[0]):
 		for j in range(B.shape[1]):
@@ -310,7 +312,7 @@ def extensive_to_sequence_form(game):
 				# If turn is valid, continue down path from root
 				if bend < len(bt.children(cur_node)):
 					cur_node = bt.children(cur_node)[bend]
-				# If invalid, then path does not exist in tree; payoffs 0
+				# If invalid, path does not exist in tree; payoffs 0
 				else:
 					cur_node = None
 					break
@@ -324,13 +326,13 @@ def extensive_to_sequence_form(game):
 				B[i][j] = cur_node.payoffs[1]
 
 	##### Now solving for E, e, F, f #########
-	U_1 = np.unique(np.array([node.information_set \
+	U_1 = unique(array([node.information_set \
 			for node in nodes if node.information_set[0]==1]))
-	U_2 = np.unique(np.array([node.information_set \
+	U_2 = unique(array([node.information_set \
 			for node in nodes if node.information_set[0]==2]))
 
-	E = np.zeros((U_1.shape[0] + 1, A_sequences.size))
-	F = np.zeros((U_2.shape[0] + 1, B_sequences.size))
+	E = zeros((U_1.shape[0] + 1, A_sequences.size))
+	F = zeros((U_2.shape[0] + 1, B_sequences.size))
 	
 	E[0][0], F[0][0] = 1, 1
 
@@ -355,8 +357,8 @@ def extensive_to_sequence_form(game):
 			F[i][index] = 1
 
 	# Populate e, f
-	e = np.zeros((U_1.shape[0]+1,1))
-	f = np.zeros((U_2.shape[0]+1,1))
+	e = zeros((U_1.shape[0]+1,1))
+	f = zeros((U_2.shape[0]+1,1))
 	e[0][0] = 1
 	f[0][0] = 1
 	
