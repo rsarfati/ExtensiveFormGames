@@ -4,6 +4,7 @@ import copy
 sys.path.insert(1, '../src')
 from game import *
 
+print('============= Ex. 1 ==============')
 # Want to test the following tree:
 #                  (1, 1)
 #                 /      \
@@ -41,6 +42,7 @@ inf4_2.add_child(2, 12).set_payoffs([3, 3])
 
 leaves_list = gt.leaves()
 
+print('======== Leaves:')
 for l in leaves_list:
 	print(l.get_sequences())
 
