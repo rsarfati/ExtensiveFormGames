@@ -25,11 +25,10 @@ def get_sequence_continuations(game, node):
     while not Q.isempty():
         node = Q.get()
 
-
-def get_player_sequences(game, player):
+def get_player_actions(game, player):
     """
     Inputs: game::GameTree, player::Int
-    Output: unique player sequences (list of information sets/actions taken)
+    Output: All player actions (list of information sets/actions taken)
     """
     if game is None:
         raise InvalidInputException("Input is None")

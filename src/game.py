@@ -149,7 +149,28 @@ class GameTree:
         self.t_root   = None
         self.t_size   = 0
         self.t_height = 0
-                
+    
+    def get_player_sequences(game, player):
+        """
+        Inputs: game::GameTree, player::Int
+        Output: unique player sequences (list of information sets/actions taken)
+        """
+        if game is None:
+            raise InvalidInputException("Input is None")
+        if game.tree.is_empty():
+            return []
+
+        gt = game.tree
+        root = gt.root()
+
+        sequences = [[]]
+
+        for l in gt.leaves():
+            if player in l.get_sequences().keys():
+                sequences.append(l.get_sequences()[player])
+
+        return unique(sequences)
+
     def root(self): 
         """
         Input: GameTree (implicit argument)
