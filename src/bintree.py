@@ -33,7 +33,8 @@ class Node:
         self.n_parent = parent
         self.n_value = value
         self.payoffs = None
-        self.information_set = (None,None)
+        self.information_set = (None, None)
+        self.sequences  = {} # Maps players to the sequences getting them to node
         self.sequence_a = []
         self.sequence_b = []
         
@@ -46,7 +47,7 @@ class Node:
             self.n_depth = parent.depth() + 1
 
     def set_information_set(self, player, inf_set):
-        self.information_set = (player,inf_set)
+        self.information_set = (player, inf_set)
 
     def set_payoffs(self, new_payoffs):
         self.payoffs = new_payoffs
