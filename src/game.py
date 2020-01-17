@@ -1,16 +1,14 @@
-import GameTree
-
 class Game:
 
-    def __init__(self, n_players, tree) :
+    def __init__(self, num_players, tree) :
         """
-        Input: Node (implicit argument), parent: Node, value: anything
+        Input: Game (implicit argument), num_player: Int, value: anything
         Output: a Node with a parent node and a value
         Purpose: constructor for a Node
         """
-        self.n_players = n_players
-        self.tree = tree
-    
+        self.num_players = num_players
+        self.tree = GameTree() if tree is None else tree
+
     def size(self):
         """
         Input: Game (implicit)
@@ -47,9 +45,9 @@ class Node:
         Purpose: Constructor for a Node
         """
         self.n_parent          = parent
-        self.n_payoffs         = None
         self.n_player          = player
         self.n_information_set = inf_set
+        self.n_payoffs         = None
         self.n_children        = []
 
         if self.n_parent is None:
@@ -58,7 +56,7 @@ class Node:
             self.n_depth = 0 
             
             # Maps players to the sequences getting them to node
-            self.n_sequences  = {} 
+            self.n_sequences  = {player: []}
         else:
             self.n_id    = parent.num_children() + 1
             self.n_depth = parent.depth()        + 1
@@ -100,7 +98,7 @@ class Node:
         return self.n_children
 
     def num_children(self):
-        return length(self.n_children)
+        return len(self.n_children)
     
     def depth(self):
         """
@@ -122,8 +120,8 @@ class Node:
         output += "; Information Set: "
         output += repr(self.n_information_set)
 
-        for child in self.n_children
-            output += "; " + child.n_id + ": "
+        for child in self.n_children:
+            output += "; Child " + str(child.n_id) + ": "
             output += str(child)
         output += ")"
         return output
@@ -151,7 +149,7 @@ class GameTree:
         Purpose: return the root node 
         Throw a EmptyGameTreeException if the tree is empty
         """
-        if self.isEmpty():
+        if self.is_empty():
             raise EmptyGameTreeException("Tree is empty")
         return self.t_root
             
@@ -202,7 +200,7 @@ class GameTree:
         Purpose: return the height of the tree in O(1) time
         Exceptions: throw an EmptyGameTreeException if the height is undefined
         """
-        if self.isEmpty():
+        if self.is_empty():
             raise EmptyGameTreeException("Tree is empty, height undefined")
         return self.t_height
 
@@ -239,7 +237,7 @@ class GameTree:
     def is_root(self, node):
         """
         Input: GameTree (implicit argument), node: Node
-        Output: boolean
+        Output: Boolean
         Purpose: return whether the node is the root
         Exceptions: throw an InvalidInputException if input is None
         """
@@ -288,7 +286,8 @@ class GameTree:
                  If there is one already, just return it
         """
         if self.t_root is None:
-            self.t_root = Node(None, player, inf_set)
+            self.t_root  = Node(None, player, inf_set)
+            self.t_root.sequences = {}
             self.t_size += 1
         return self.t_root
 
@@ -302,12 +301,12 @@ class GameTree:
         if node is None:
             raise InvalidInputException("Input is None")
         
-        node.add_child(player, inf_set)
+        child = node.add_child(player, inf_set)
 
         self.t_size += 1
-        if node.left().depth() > self.t_height:
-            self.t_height = node.left().depth()
-        return node.left()
+        if child.depth() > self.t_height:
+            self.t_height = child.depth()
+        return child
         
     def __str__(self):
         """
@@ -315,7 +314,7 @@ class GameTree:
         Output: String representation of GameTree
         Purpose: printing
         """
-        toReturn = 'Size: ' + str(self.size()) + '\n'
+        toReturn  = 'Size: ' + str(self.size()) + '\n'
         toReturn += 'Height: ' + str(self.height()) + '\n'
         toReturn += str(self.root()) 
         return toReturn
