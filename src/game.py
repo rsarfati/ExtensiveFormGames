@@ -175,7 +175,6 @@ class GameTree:
         """
         if node is None:
             raise InvalidInputException("Input is None")
-
         return node.n_children
     
     def is_empty(self):
@@ -205,7 +204,6 @@ class GameTree:
         """
         if self.isEmpty():
             raise EmptyGameTreeException("Tree is empty, height undefined")
-
         return self.t_height
 
     def is_internal(self, node):
@@ -235,11 +233,10 @@ class GameTree:
 
         if node.parent() is None:
             return True
-        if not node.hasLeft() and not node.hasRight():
-            return True
-        return False
 
-    def isRoot(self, node):
+        return node.num_children() == 0
+
+    def is_root(self, node):
         """
         Input: GameTree (implicit argument), node: Node
         Output: boolean
@@ -253,145 +250,64 @@ class GameTree:
             return True
         return False
 
-    def left(self, node):
+    def get_child(self, node, child_id):
         """
         Input: GameTree (implicit argument), node: Node
         Output: Node
         Purpose: get the left child of the node (if possible)
         Exceptions: throw an InvalidInputException if input is None
         """
-        if node is None:
+        if node is None or child_id is None:
+            raise InvalidInputException("Input/Child ID is None")
+        
+        if node.num_children() < child_id:
+            raise InvalidInputException("Node does not have such a child.")
+        
+        return node.children[child_id]
+
+    def is_child(self, node, child):
+        """
+        Input: GameTree (implicit), node: Node, child: Node
+        Output: Boolean
+        Purpose: Indicate whether child is of node.
+        """
+        if node is None or child is None:
             raise InvalidInputException("Input is None")
 
-        if node.hasLeft():
-            return node.left()
-        return None
+        for node_child in node.children():
+            if child == node_child:
+                return True
 
-    def right(self, node): 
-        """
-        Input: GameTree (implicit argument), node: Node
-        Output: Node
-        Purpose: get the right child of the node (if possible)
-        Exceptions: throw an InvalidInputException if input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if node.hasRight():
-            return node.right()
-        return None
-
-    def isLeft(self, node):
-        """
-        Input: GameTree (implicit argument), node: Node
-        Output: Node
-        Purpose: get the right child of the node (if possible)
-        Exceptions: throw an InvalidInputException if input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if self.parent(node).hasLeft():
-            if (self.left(self.parent(node)) == node):
-                return 1
-        return 0
-
-    def isRight(self, node):
-        """
-        Input: GameTree (implicit argument), node: Node
-        Output: Node
-        Purpose: get the right child of the node (if possible)
-        Exceptions: throw an InvalidInputException if input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if self.parent(node).hasRight():
-            if (self.right(self.parent(node)) == node):
-                return 1
-        return 0
-
-    def hasLeft(self, node):
-        """
-        Input: GameTree (implicit argument), node: Node
-        Output: boolean
-        Purpose: return whether the node has a left child
-        Exceptions: throw an InvalidInputException if input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if node.hasLeft():
-            return True
         return False
 
-    def hasRight(self, node):
+    def add_root(self, player, inf_set):
         """
-        Input: GameTree (implicit argument), node: Node
-        Output: boolean
-        Purpose: return whether the node has a right child
-        Exceptions: throw an InvalidInputException if input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if node.hasRight():
-            return True
-        return False
-
-    def addRoot(self, e):
-        """
-        Input: GameTree (implicit argument), e: anything
+        Input: GameTree (implicit argument), player: Int, inf_set: Int.
         Output: Node (the root node)
         Purpose: add a root to the tree only if there isn't one already and return it.
                  If there is one already, just return it
         """
         if self.t_root is None:
-            self.t_root = Node(None, e)
+            self.t_root = Node(None, player, inf_set)
             self.t_size += 1
         return self.t_root
 
-    def addLeft(self, node, e):
+    def add_child(self, node, player, inf_set):
         """
-        Input: GameTree (implicit argument), node: Node, e: anything
-        Output: the left child of the node
-        Purpose: add a left child to the node only if there isn't one already and return it.
-                 If there is one already, just return it
+        Input: GameTree (implicit argument), node: Node, player: Int, inf_set: Int.
+        Output: Node (the added node)
+        Purpose: Add a child to the node  and return it.
         Exceptions: throw an InvalidInputException if node input is None
         """
         if node is None:
             raise InvalidInputException("Input is None")
-
-        if node.hasLeft():
-            return node.left()
         
-        node.addLeft(e)
+        node.add_child(player, inf_set)
+
         self.t_size += 1
         if node.left().depth() > self.t_height:
             self.t_height = node.left().depth()
         return node.left()
-
-    def addRight(self, node, e):
-        """
-        Input: GameTree (implicit argument), node: Node, e: anything
-        Output: the right child of the node
-        Purpose: add a right child to the node only if there isn't one already and return it.
-                 If there is one already, return it
-        Exceptions: throw an InvalidInputException if node input is None
-        """
-        if node is None:
-            raise InvalidInputException("Input is None")
-
-        if self.hasRight(node):
-            return node.right()
-        
-        node.addRight(e)
-
-        self.t_size += 1
-        if node.right().depth() > self.t_height:
-            self.t_height = node.right().depth()
-        
-        return node.right()
         
     def __str__(self):
         """
@@ -405,8 +321,8 @@ class GameTree:
         return toReturn
 
  
-    def getheight(self, node):
+    def get_height(self, node):
         if not node:
             return 0
         else:
-            return max(getheight(node.left), getheight(node.right)) + 1
+            return max([getheight(x) for x in node.children()]) + 1
