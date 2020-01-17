@@ -2,10 +2,11 @@
 from numpy import unique, zeros, eye
 from queue import Queue
 
-def get_player_sequences(game, player):
+def get_sequence_continuations(game, node):
     """
-    Inputs: game::GameTree, player::Int
-    Output: unique player sequences (list of information sets)
+    Inputs: game::GameTree
+
+    Want to put sequences on the information sets to which they correspond
     """
     if game is None:
         raise InvalidInputException("Input is None")
@@ -15,14 +16,36 @@ def get_player_sequences(game, player):
     t = game.tree
     root = t.root()
 
+    # To output:
     sequences = [[]]
 
     Q     = Queue()
     qlist = []
-    qlist.append(bt.root())
-    Q.put(bt.root())
 
-    return sequences
+    while not Q.isempty():
+        node = Q.get()
+
+
+def get_player_sequences(game, player):
+    """
+    Inputs: game::GameTree, player::Int
+    Output: unique player sequences (list of information sets/actions taken)
+    """
+    if game is None:
+        raise InvalidInputException("Input is None")
+    if game.tree.is_empty():
+        return []
+
+    gt = game.tree
+    root = gt.root()
+
+    sequences = [[]]
+
+    for l in gt.leaves():
+        if player in l.get_sequences().keys():
+            sequences.append(l.get_sequences()[player])
+
+    return unique(sequences)
 
 def get_info_sets(game):
     """

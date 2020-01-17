@@ -3,6 +3,7 @@ import sys
 import copy
 sys.path.insert(1, '../src')
 from game import *
+from build_regret_matrices import *
 
 print('============= Ex. 1 ==============')
 # Want to test the following tree:
@@ -46,3 +47,7 @@ print('======== Leaves:')
 for l in leaves_list:
 	print(l.get_sequences())
 
+print('======== Player Sequences:')
+for p in [1, 2]:
+	print('Player ' + str(p) + ':')
+	print(get_player_sequences(g, p))
