@@ -1,4 +1,6 @@
+#!/usr/bin/python3
 import sys
+import copy
 sys.path.insert(1, '../src')
 from game import *
 
@@ -13,7 +15,7 @@ from game import *
 # |3|    |0|  |2|  |0| |4|  |2|   |1|  |3|
 
 gt = GameTree()
-g = Game(2, gt)
+g  = Game(2, gt)
 
 r = gt.add_root(1, 1)
 inf2_1 = r.add_child(2, 2)
@@ -25,17 +27,20 @@ inf3_2 = inf2_1.add_child(1, 3)
 inf4_1 = inf2_2.add_child(1, 4)
 inf4_2 = inf2_2.add_child(1, 4)
 
-set_payoffs(inf3_1.add_child(2, 5), [3, 3])
-set_payoffs(inf3_1.add_child(2, 6), [2, 0])
+inf3_1.add_child(2, 5).set_payoffs([3, 3])
+inf3_1.add_child(2, 6).set_payoffs([2, 0])
 
-set_payoffs(inf3_2.add_child(2, 7), [2, 2])
-set_payoffs(inf3_2.add_child(2, 8), [0, 0])
+inf3_2.add_child(2, 7).set_payoffs([2, 2])
+inf3_2.add_child(2, 8).set_payoffs([0, 0])
 
-set_payoffs(inf4_1.add_child(2, 9), [0, 4])
-set_payoffs(inf4_1.add_child(2, 10),[2, 2])
+inf4_1.add_child(2, 9).set_payoffs([0, 4])
+inf4_1.add_child(2, 10).set_payoffs([2, 2])
 
-set_payoffs(inf4_2.add_child(2, 11),[1, 1])
-set_payoffs(inf4_2.add_child(2, 12),[3, 3])
+inf4_2.add_child(2, 11).set_payoffs([1, 1])
+inf4_2.add_child(2, 12).set_payoffs([3, 3])
 
+leaves_list = gt.leaves()
 
+for l in leaves_list:
+	print(l.get_sequences())
 
