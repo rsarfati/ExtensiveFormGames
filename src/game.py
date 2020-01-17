@@ -307,7 +307,59 @@ class GameTree:
         if child.depth() > self.t_height:
             self.t_height = child.depth()
         return child
+    
+    def nodes(self):
+        """
+        Input: GameTree (implicit argument)
+        Output: List of Nodes
+        Purpose: Return all nodes in tree
+        """
+        if self.is_empty():
+            return []
+
+        Q = Queue()
+        qlist = []
+        qlist.append(self.root())
+        Q.put(self.root())
+    
+        while not Q.empty():
+            node = Q.get()
+            for child in node.children():
+                Q.put(child)
+                qlist.append(child)
+
+        return qlist
+
+    def is_leaf(self, node):
+        """
+        Input: GameTree (implicit argument)
+        Output: Boolean
+        Purpose: Return true if node is leaf
+        """
+        if self.is_external(node):
+            if node.parent() is None:
+                return self.size() == 1
+            else:
+                return True
+        return False
+
+    def leaves(self):
+        """
+        Input: GameTree (implicit argument)
+        Output: List of Nodes
+        Purpose: Return a list of leaves
+        """
+        if self.root() is None:
+            return []
         
+        output = []
+        node_list = self.nodes()
+        for node in node_list:
+            if is_leaf(node):
+                output.append(node)
+        return output
+
+
     def __str__(self):
         """
         Input: GameTree (implicit argument)
