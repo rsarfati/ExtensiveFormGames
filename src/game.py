@@ -171,13 +171,15 @@ class GameTree:
         if self.is_empty():
             return []
 
+        # Output: List of player sequences
         sequences = [[]]
 
         for l in self.leaves():
             if player in l.get_sequences().keys():
                 sequences.append(l.get_sequences()[player])
 
-        return unique(sequences)
+        # Removing the dummy empty list (first item)
+        return unique(sequences)[1:]
 
     def get_player_actions(self, player):
         """
@@ -343,9 +345,7 @@ class GameTree:
         if node is None:
             raise InvalidInputException("Input is None")
 
-        if node.parent() is None:
-            return True
-        return False
+        return node.parent() is None
 
     def get_child(self, node, child_id):
         """
@@ -436,10 +436,7 @@ class GameTree:
         Purpose: Return true if node is leaf
         """
         if self.is_external(node):
-            if node.parent() is None:
-                return self.size() == 1
-            else:
-                return True
+            return not self.is_root(node)
         return False
 
     def leaves(self):
@@ -458,14 +455,13 @@ class GameTree:
                 output.append(node)
         return output
 
-
     def __str__(self):
         """
         Input: GameTree (implicit argument)
         Output: String representation of GameTree
         Purpose: printing
         """
-        toReturn  = 'Size: ' + str(self.size()) + '\n'
+        toReturn  = 'Size: '   + str(self.size())   + '\n'
         toReturn += 'Height: ' + str(self.height()) + '\n'
         toReturn += str(self.root()) 
         return toReturn
