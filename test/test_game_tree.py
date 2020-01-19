@@ -7,6 +7,7 @@ from build_regret_matrices import *
 
 print('============= Ex. 1 ==============')
 # Want to test the following tree:
+#
 #                  (1, 1)
 #                 /      \
 #           (2, 2)........(2, 2)
@@ -50,4 +51,15 @@ for l in leaves_list:
 print('======== Player Sequences:')
 for p in [1, 2]:
 	print('Player ' + str(p) + ':')
-	print(get_player_sequences(g, p))
+	print(gt.get_player_sequences(p))
+
+print('======== Player Actions:')
+for p in [1, 2]:
+	print('Player ' + str(p) + ':')
+	print(gt.get_player_actions(p))
+
+print('======== Player Inf. Sets:')
+for p in [1, 2]:
+	print('Player ' + str(p) + ':')
+	print(gt.get_player_info_sets(p))
+

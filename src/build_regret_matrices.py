@@ -25,27 +25,6 @@ def get_sequence_continuations(game, node):
     while not Q.isempty():
         node = Q.get()
 
-def get_player_actions(game, player):
-    """
-    Inputs: game::GameTree, player::Int
-    Output: All player actions (list of information sets/actions taken)
-    """
-    if game is None:
-        raise InvalidInputException("Input is None")
-    if game.tree.is_empty():
-        return []
-
-    gt = game.tree
-    root = gt.root()
-
-    sequences = [[]]
-
-    for l in gt.leaves():
-        if player in l.get_sequences().keys():
-            sequences.append(l.get_sequences()[player])
-
-    return unique(sequences)
-
 def get_info_sets(game):
     """
     Input: game tree
@@ -68,14 +47,16 @@ def first_move_after_divergence(ind, seqfrom):
     print("out", i)
     return ind
 
-def build_regret_matrices_seq_to_seq():#(game):
-    #sequences = get_player_sequences(game)
-    sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
-    info_sets = [1, 2, 3, 4] #get_info_sets(game)
-    
+def build_regret_matrices_seq_to_seq(game, player):
+    # sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
+    # info_sets = [1, 2, 3, 4]
+    gt = game.tree
+    sequences = gt.get_player_sequences(player)
+    info_sets = gt.get_player_info_sets(player)
     n_info    = len(info_sets)
-    
-    phi_list  = [] # To output: list of regret matrices
+
+    # To output: list of regret matrices
+    phi_list  = [] 
     
     for seq_from in sequences:
         for seq_to in sequences:

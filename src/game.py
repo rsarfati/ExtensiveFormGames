@@ -1,5 +1,7 @@
 from copy import *
 from queue import Queue
+from numpy import unique
+
 class Game:
 
     def __init__(self, num_players, tree) :
@@ -73,7 +75,16 @@ class Node:
                 self.n_sequences[parent.n_player].append(self.n_id)
 
     def set_information_set(self, inf_set):
-        self.information_set = inf_set
+        self.n_information_set = inf_set
+    
+    def get_information_set(self):
+        return self.n_information_set
+
+    def get_player(self):
+        return self.n_player
+
+    def get_id(self):
+        return self.n_id
 
     def set_payoffs(self, new_payoffs):
         self.payoffs = new_payoffs
@@ -101,6 +112,9 @@ class Node:
         child = Node(self, player, inf_set)
         self.n_children.append(child)
         return child
+
+    def is_leaf(self):
+        return len(self.n_children) == 0
 
     def get_children(self):
         return self.n_children
@@ -139,7 +153,6 @@ class GameTree:
 
     A node-and-link based Game Tree structure.
     """
-
     def __init__(self) :
         """
         Input:  GameTree (implicit argument)
@@ -150,26 +163,83 @@ class GameTree:
         self.t_size   = 0
         self.t_height = 0
     
-    def get_player_sequences(game, player):
+    def get_player_sequences(self, player):
         """
-        Inputs: game::GameTree, player::Int
+        Inputs: GameTree (implicit), player::Int
         Output: unique player sequences (list of information sets/actions taken)
         """
-        if game is None:
-            raise InvalidInputException("Input is None")
-        if game.tree.is_empty():
+        if self.is_empty():
             return []
-
-        gt = game.tree
-        root = gt.root()
 
         sequences = [[]]
 
-        for l in gt.leaves():
+        for l in self.leaves():
             if player in l.get_sequences().keys():
                 sequences.append(l.get_sequences()[player])
 
         return unique(sequences)
+
+    def get_player_actions(self, player):
+        """
+        Inputs: game::GameTree, player::Int
+        Output: unique player sequences (list of information sets/actions taken)
+        """
+        if self.is_empty():
+            return []
+
+        player_actions = list([])
+
+        Q        = Queue()
+        inf_list = {}
+
+        Q.put(self.root())
+
+        while not Q.empty():
+            node = Q.get()
+            
+            if node.get_player() == player:
+                if node.get_information_set() not in inf_list.keys():
+                    
+                    # W/in inf set, actions should be same; don't double-count
+                    inf_list[node.get_information_set()] = node
+                    
+                    # This is enumerating available actions at given inf set
+                    for child in node.get_children():
+                        player_actions.append(child.get_id())
+
+            for child in node.get_children():
+                Q.put(child)
+
+        return player_actions
+
+    def get_player_info_sets(self, player):
+        """
+        Inputs: game::GameTree, player::Int
+        Output: unique information sets of player choice nodes
+        """
+        if self.is_empty():
+            return []
+
+        player_actions = list([])
+
+        Q        = Queue()
+        inf_list = {}
+
+        Q.put(self.root())
+
+        while not Q.empty():
+            n = Q.get()
+            
+            if n.get_player() == player:
+                # Don't double-count
+                n_info = n.get_information_set()
+                if n_info not in inf_list.keys() and not n.is_leaf():
+                    inf_list[n_info] = n
+
+            for child in n.get_children():
+                Q.put(child)
+
+        return list(inf_list.keys())
 
     def root(self): 
         """
