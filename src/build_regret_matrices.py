@@ -40,30 +40,47 @@ def first_move_after_divergence(ind, seqfrom):
     print("out", i)
     return ind
 
-def get_sequence_weight_vectors(game, player):
-    gt = game.tree
+def info_set_to_index(game, player):
+    """
+    Input: game::Game, player::Int
+    Output: tup_len::Int, inf_to_ind::Dict
+    Complexity: O(n), n = # nodes in GameTree
 
-    inf_to_children = gt.info_set_to_num_children(player)
+    Maps information set to index in sequence weight vector.
+    """
+    inf_to_children = game.tree.info_set_to_num_children(player)
+    inf_to_ind      = {}
     
+    tup_len          = 0
+    for i in inf_to_children.keys():
+        inf_to_ind[i] = copy(tup_len)
+        tup_len      += inf_to_children[i]
+    
+    return tup_len, inf_to_ind
+
+def get_sequence_weight_vectors(game, player):
+    """
+    Input: game::Game, player::Int
+    Output: seq_weight_vectors::List{List}
+    Complexity: O(n), n = # nodes in GameTree
+
+    Retrieves all sequence weight vectors of player.
+    """
     inf_to_prefix = {} # Maps information set to its prefix
     inf_list      = {} # Maps information set to node (to keep track of visited)
-    inf_to_ind    = {} # Maps information set to index in sq weight vec
 
     # Need to keep track of these when skipping over opponent's information sets
     last_player_inf  = {}
     last_player_move = {}
 
-    # Determine the tuple length and the starting indices for information sets
-    tup_len = 0
-    for i in inf_to_children.keys():
-        inf_to_ind[i] = copy(tup_len)
-        tup_len += inf_to_children[i]
+    # Maps information set to index in sq weight vec
+    tup_len, inf_to_ind = info_set_to_index(game, player)
 
     # Desired output:
     seq_weight_vectors = [[]]
 
     Q  = Queue()
-    Q.put(gt.root())
+    Q.put(game.tree.root())
 
     # Breadth-first search through tree
     while not Q.empty():
@@ -119,32 +136,37 @@ def get_sequence_weight_vectors(game, player):
     # This convoluted expression just ensures uniqueness of entries
     return [list(x) for x in set(tuple(i) for i in seq_weight_vectors[1:])]
 
+def build_internal_regret_matrices_seq_to_seq(game, player):
+    """
+    Input: game::Game, player::Int
+    Output: phi_list::List{Array}
 
-def build_regret_matrices_seq_to_seq(game, player):
+    Returns internal (pair-wise mappings) phi-regret matrices.
+    """
     # sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
-    # info_sets = [1, 2, 3, 4]
+
     gt        = game.tree
-    sequences = gt.get_player_sequences(player)
-    info_sets = gt.get_player_info_sets(player)
-    n_info    = len(info_sets)
+    sequences = get_sequence_weight_vectors(game, player)
+    phi_size  = len(sequences[1])
+
+    # Maps information set to index in sq weight vec
+    tup_len, inf_to_ind = info_set_to_index(game, player)
 
     # To output: list of regret matrices
     phi_list  = [] 
-    
-    print(sequences)
 
     for seq_from in sequences:
         for seq_to in sequences:
 
             # Want to construct a matrix *per* pure strategy sequence 
-            phi = zeros((n_info, n_info))
+            phi = zeros((phi_size, phi_size))
             
             # Find the index you start from, put probability in that cell
             ind = find_first_divergence(seq_to, seq_from)
             
             # If sequences don't diverge, you return the identity!
             if ind == -1:
-                phi_list.append(eye(n_info, n_info))
+                phi_list.append(eye(phi_size, phi_size))
             else:
                 # Everything preceding first divergence should be the same;
                 # Ones on diagonal

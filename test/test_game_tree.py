@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-
-# Useful: https://stackoverflow.com/questions/1227121/compare-object-instances-for-equality-by-their-attributes
 import sys
 import copy
 sys.path.insert(1, '../src')
@@ -8,6 +6,51 @@ import numpy as np
 import pytest
 from game import *
 from build_regret_matrices import *
+# Useful: https://stackoverflow.com/questions/1227121/compare-object-instances-for-equality-by-their-attributes
+
+def one_player_simple():
+	# Want to test the following tree:
+	#
+	#      (1, 1)
+	#     /      \
+	#  (1, 2)    (1, 3)
+	#            /    \
+	#        (1, 4)   (1, 5)
+
+	gt = GameTree()
+	g  = Game(1, gt)
+
+	r    = gt.add_root(1, 1)
+	inf2 = r.add_child(1, 2)
+	inf3 = r.add_child(1, 3)
+
+	inf3.add_child(1, 4)
+	inf3.add_child(1, 5)
+
+	leaves_list = gt.leaves()
+
+	# Leaves:
+	leaves_true = [{1: [0]}, {1: [1, 0]}, {1: [1, 1]}]
+	for (i, l) in list(enumerate(leaves_list)):
+		assert l.get_sequences() == leaves_true[i]
+
+	# Player Sequences:
+	assert gt.get_player_sequences(1) == [[1, 0], [0], [1, 1]]
+
+	# Player Actions:
+	assert gt.get_player_actions(1) == [0, 1, 0, 1]
+
+	# Player Inf. Sets:
+	assert gt.get_player_info_sets(1) == [1, 3]
+
+	# Sequence Weight Vectors:
+	assert get_sequence_weight_vectors(g, 1) == [[0, 1, 1, 0],
+												 [1, 0, 0, 0], 
+												 [0, 1, 0, 1]]
+	
+	print("Building Regret Matrices:")
+	print(build_internal_regret_matrices_seq_to_seq(g, 1))
+
 
 def one_player_2008():
 	# Want to test the following tree:
@@ -49,12 +92,14 @@ def one_player_2008():
 	# Player Inf. Sets:
 	assert gt.get_player_info_sets(1) == [1, 3, 5]
 
-	# Sequence weight vectors:
+	# Sequence Weight Vectors:
 	assert get_sequence_weight_vectors(g, 1) == [[1, 0, 0, 0, 0, 0], 
 												 [0, 1, 0, 1, 1, 0], 
 												 [0, 1, 0, 1, 0, 1], 
 												 [0, 1, 1, 0, 0, 0]]
-	#build_regret_matrices_seq_to_seq(g, 1)
+	
+	#print("Building Regret Matrices:")
+	#print(build_regret_matrices_seq_to_seq(g, 1))
 
 def simple_two_player_imp_info():
 	# Want to test the following tree:
@@ -114,11 +159,12 @@ def simple_two_player_imp_info():
 	assert gt.get_player_info_sets(1) == [1, 3, 4]
 	assert gt.get_player_info_sets(2) == [2]
 
+	# Sequence Weight Vectors:
 	assert get_sequence_weight_vectors(g, 1) == [[1, 0, 1, 0, 0, 0], [0, 1, 0, 0, 1, 0], [1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1]]
 	assert get_sequence_weight_vectors(g, 2) == [[0, 1], [1, 0]]
 
 def get_tests():
-    return [simple_two_player_imp_info, one_player_2008]
+    return [simple_two_player_imp_info, one_player_2008, one_player_simple]
 
 # The mainline runs all of the test functions in the list returned by get_tests
 if __name__ == '__main__' :
