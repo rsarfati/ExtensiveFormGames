@@ -58,7 +58,7 @@ def info_set_to_index(game, player):
     
     return tup_len, inf_to_ind
 
-def get_sequence_weight_vectors(game, player):
+def get_sequence_weight_vectors(game, player, return_all=False):
     """
     Input: game::Game, player::Int
     Output: seq_weight_vectors::List{List}
@@ -134,7 +134,12 @@ def get_sequence_weight_vectors(game, player):
             Q.put(child)
 
     # This convoluted expression just ensures uniqueness of entries
-    return [list(x) for x in set(tuple(i) for i in seq_weight_vectors[1:])]
+    to_return = [list(x) for x in set(tuple(i) for i in seq_weight_vectors[1:])]
+    
+    if return_all:
+        return to_return, inf_to_prefix, last_player_inf, last_player_move
+
+    return to_return
 
 def build_internal_regret_matrices_seq_to_seq(game, player):
     """
@@ -144,10 +149,10 @@ def build_internal_regret_matrices_seq_to_seq(game, player):
     Returns internal (pair-wise mappings) phi-regret matrices.
     """
     # sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
-
-    gt        = game.tree
-    sequences = get_sequence_weight_vectors(game, player)
-    phi_size  = len(sequences[1])
+    sequences, inf_to_prefix, last_player_inf, last_player_move = get_sequence_weight_vectors(game, player, return_all=True)
+    
+    gt       = game.tree
+    phi_size = len(sequences[1])
 
     # Maps information set to index in sq weight vec
     tup_len, inf_to_ind = info_set_to_index(game, player)

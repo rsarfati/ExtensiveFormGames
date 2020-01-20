@@ -48,6 +48,9 @@ class Node:
         Output:  Node with a parent node and a value
         Purpose: Constructor for a Node
         """
+        if inf_set <= 0:
+            raise InvalidInputException("Information set must be strictly positive.")
+
         self.n_parent          = parent
         self.n_player          = player
         self.n_information_set = inf_set
@@ -75,6 +78,8 @@ class Node:
                 self.n_sequences[parent.n_player].append(self.n_id)
 
     def set_information_set(self, inf_set):
+        if inf_set <= 0:
+            raise InvalidInputException("Information set must be strictly positive.")
         self.n_information_set = inf_set
     
     def get_information_set(self):
