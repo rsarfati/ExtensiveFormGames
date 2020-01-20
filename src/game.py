@@ -263,7 +263,7 @@ class GameTree:
         while not Q.empty():
             n = Q.get()
             
-            if n.get_player() == player:
+            if n.get_player() == player and not n.is_leaf():
                 # Don't double-count
                 n_info = n.get_information_set()
                 if n_info not in inf_list.keys():# and not n.is_leaf():
