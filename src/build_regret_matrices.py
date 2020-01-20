@@ -49,11 +49,12 @@ def get_sequence_weight_vectors(game, player):
     inf_list      = {} # Maps information set to node (to keep track of visited)
     inf_to_ind    = {} # Maps information set to index in sq weight vec
 
+    # Need to keep track of these when skipping over opponent's information sets
     last_player_inf  = {}
     last_player_move = {}
 
+    # Determine the tuple length and the starting indices for information sets
     tup_len = 0
-
     for i in inf_to_children.keys():
         inf_to_ind[i] = copy(tup_len)
         tup_len += inf_to_children[i]
@@ -64,11 +65,11 @@ def get_sequence_weight_vectors(game, player):
     Q  = Queue()
     Q.put(gt.root())
 
-    # Breadth-first search
+    # Breadth-first search through tree
     while not Q.empty():
         n = Q.get()
 
-        # If player's inf set did not precede it, set to 0
+        # If player's inf set did not precede node, set to 0
         if n not in last_player_inf.keys():
             last_player_inf[n] = 0
             
@@ -92,7 +93,7 @@ def get_sequence_weight_vectors(game, player):
                 seq_weight_vectors.append(deepcopy(tup_new))
 
         for child in n.get_children():
-            
+
             last_player_inf[child] = deepcopy(last_player_inf[n])
             
             if n.get_player() == player:
