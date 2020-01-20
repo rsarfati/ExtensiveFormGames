@@ -179,7 +179,7 @@ class GameTree:
                 sequences.append(l.get_sequences()[player])
 
         # Removing the dummy empty list (first item)
-        return unique(sequences)[1:]
+        return [list(x) for x in set(tuple(i) for i in sequences[1:])]
 
     def get_player_actions(self, player):
         """

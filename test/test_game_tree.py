@@ -35,26 +35,25 @@ def one_player_2008():
 
 	leaves_list = gt.leaves()
 
-	print('- - - - - Leaves:')
-	for l in leaves_list:
-		print(l.get_sequences())
+	# Leaves:
+	leaves_true = [{1: [0]}, {1: [1, 0]}, {1: [1, 1, 0]}, {1: [1, 1, 1]}]
+	for (i, l) in list(enumerate(leaves_list)):
+		assert l.get_sequences() == leaves_true[i]
 
-	print('- - - - - Player Sequences:')
-	for p in [1]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_sequences(p))
+	# Player Sequences:
+	assert gt.get_player_sequences(1) == [[1, 1, 0], [1, 0], [0], [1, 1, 1]]
 
-	print('- - - - - Player Actions:')
-	for p in [1]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_actions(p))
+	# Player Actions:
+	assert gt.get_player_actions(1) == [0, 1, 0, 1, 0, 1]
 
-	print('- - - - - Player Inf. Sets:')
-	for p in [1]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_info_sets(p))
+	# Player Inf. Sets:
+	assert gt.get_player_info_sets(1) == [1, 3, 5]
 
-	print(get_sequence_weight_vectors(g, 1))
+	# Sequence weight vectors:
+	assert get_sequence_weight_vectors(g, 1) == [[1, 0, 0, 0, 0, 0], 
+												 [0, 1, 0, 1, 1, 0], 
+												 [0, 1, 0, 1, 0, 1], 
+												 [0, 1, 1, 0, 0, 0]]
 	#build_regret_matrices_seq_to_seq(g, 1)
 
 def simple_two_player_imp_info():
@@ -96,37 +95,36 @@ def simple_two_player_imp_info():
 
 	leaves_list = gt.leaves()
 
-	print('- - - - - Leaves:')
-	for l in leaves_list:
-		print(l.get_sequences())
+	# Leaves:
+	leaves_true = [ {1: [0, 0], 2: [0]}, {1: [0, 1], 2: [0]}, {1: [0, 0], 2: [1]},
+					{1: [0, 1], 2: [1]}, {1: [1, 0], 2: [0]}, {1: [1, 1], 2: [0]},
+					{1: [1, 0], 2: [1]}, {1: [1, 1], 2: [1]}]
+	for (i, l) in list(enumerate(leaves_list)):
+		assert l.get_sequences() == leaves_true[i]
 
-	print('- - - - - Player Sequences:')
-	for p in [1, 2]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_sequences(p))
+	# Player Sequences:
+	assert gt.get_player_sequences(1) == [[0, 1], [1, 0], [0, 0], [1, 1]]
+	assert gt.get_player_sequences(2) == [[0], [1]]
 
-	print('- - - - - Player Actions:')
-	for p in [1, 2]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_actions(p))
+	# Player Actions:
+	assert gt.get_player_actions(1) == [0, 1, 0, 1, 0, 1]
+	assert gt.get_player_actions(2) == [0, 1]
 
-	print('- - - - - Player Inf. Sets:')
-	for p in [1, 2]:
-		print('Player ' + str(p) + ':')
-		print(gt.get_player_info_sets(p))
+	# Player Inf. Sets:
+	assert gt.get_player_info_sets(1) == [1, 3, 4]
+	assert gt.get_player_info_sets(2) == [2]
 
-	print(get_sequence_weight_vectors(g, 1))
-	print(get_sequence_weight_vectors(g, 2))
+	assert get_sequence_weight_vectors(g, 1) == [[1, 0, 1, 0, 0, 0], [0, 1, 0, 0, 1, 0], [1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1]]
+	assert get_sequence_weight_vectors(g, 2) == [[0, 1], [1, 0]]
 
 def get_tests():
-    #return [von_stengel_test, test2, test3, test4, matching_pennies_sequence, dif1]
     return [simple_two_player_imp_info, one_player_2008]
 
 # The mainline runs all of the test functions in the list returned by get_tests
 if __name__ == '__main__' :
 	print('Running game tree tests...')
 	for test in get_tests():
-		print('====== ' + str(test.__name__) + ' ======')
+		print('* ' + str(test.__name__))
 		test()
 		
 	print('All tests passed!')
