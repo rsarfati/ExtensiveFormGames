@@ -56,14 +56,14 @@ class Node:
 
         if self.n_parent is None:
             # Vacuously first child
-            self.n_id    = 1
+            self.n_id    = 0
             self.n_depth = 0 
             
             # Maps players to the sequences getting them to node
             self.n_sequences  = {player: []}
         else:
-            self.n_id    = parent.num_children() + 1
-            self.n_depth = parent.depth()        + 1
+            self.n_id    = parent.num_children()
+            self.n_depth = parent.depth() + 1
             
             # Maps players to the sequences getting them to node
             self.n_sequences = deepcopy(parent.get_sequences())
@@ -190,7 +190,6 @@ class GameTree:
             return []
 
         player_actions = list([])
-
         Q        = Queue()
         inf_list = {}
 
@@ -242,6 +241,33 @@ class GameTree:
                 Q.put(child)
 
         return list(inf_list.keys())
+
+    def info_set_to_num_children(self, player):
+        """
+        Inputs: game::GameTree, player::Int
+        Output: dict mapping player's information sets to their # of children 
+        """
+        if self.is_empty():
+            return []
+
+        Q        = Queue()
+        inf_list = {}
+
+        Q.put(self.root())
+
+        while not Q.empty():
+            n = Q.get()
+            
+            if n.get_player() == player:
+                # Don't double-count
+                n_info = n.get_information_set()
+                if n_info not in inf_list.keys():# and not n.is_leaf():
+                    inf_list[n_info] = n.num_children()
+
+            for child in n.get_children():
+                Q.put(child)
+
+        return inf_list
 
     def root(self): 
         """

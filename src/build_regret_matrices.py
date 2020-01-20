@@ -25,14 +25,6 @@ def get_sequence_continuations(game, node):
     while not Q.isempty():
         node = Q.get()
 
-def get_info_sets(game):
-    """
-    Input: game tree
-    Output: unique player information sets
-    """
-    info_sets = []
-    return info_sets
-
 def find_first_divergence(seq1, seq2):
     for i in range(min(len(seq1), len(seq2))):
         if seq1[i] != seq2[i]:
@@ -47,10 +39,98 @@ def first_move_after_divergence(ind, seqfrom):
     print("out", i)
     return ind
 
+def get_sequence_weight_vectors(game, player):
+    gt = game.tree
+
+    inf_to_children = gt.info_set_to_num_children(player)
+    inf_to_ind = {}
+
+    tup_len = 0
+    print(inf_to_children.keys())
+    for i in inf_to_children.keys():
+        inf_to_ind[i] = tup_len
+        tup_len += inf_to_children[i]
+
+    print("Tup Len ")
+    print(tup_len)
+
+    print("Dict to ind")
+    print(inf_to_ind)
+
+    Q  = Queue()
+    inf_to_prefix = {} # maps information set to its prefix
+    inf_list      = {}
+
+    last_player_inf = {}
+
+    # Desired output:
+    seq_weight_vectors = [[]]
+
+    Q.put(gt.root())
+
+    while not Q.empty():
+        n = Q.get()
+
+        # If player's inf set did not precede it, set to 0
+        if n not in last_player_inf.keys():
+            last_player_inf[n] = 0
+            
+        if n.get_player() == player:
+            if n.get_information_set() not in inf_to_prefix.keys():
+                print("Information set: " + str(n.get_information_set()))
+
+                tup_new = [0]*tup_len
+
+                print(tup_new)
+                if gt.is_root(n):
+                    inf_to_prefix[n.get_information_set()] = tup_new
+                else:
+                    print("Last player: " + str(last_player_inf[n]))
+
+                    tup_new = [0]*tup_len if last_player_inf[n] == 0 else inf_to_prefix[last_player_inf[n]]
+
+                    print("Tuple init: " + str(tup_new))
+                    print("AAAAA")
+
+                    print(n.get_information_set())
+
+                    print("BBBBB")
+
+                    print(inf_to_ind[n.get_information_set()])
+
+                    print("CCCCC")
+                    tup_new[inf_to_ind[last_player_inf[n]] + n.n_id] = 1
+                    print(tup_new)
+                    inf_to_prefix[n.get_information_set()] = tup_new
+                    # W/in inf set, actions should be same; don't double-count
+                    
+                if n.is_leaf():
+                    print("Appending: " + str(tup_new))
+                    seq_weight_vectors.append(tup_new)
+
+            last_player_inf[n] = n.get_information_set()
+
+        for child in n.get_children():
+            last_player_inf[child] = last_player_inf[n]
+            Q.put(child)
+
+    return seq_weight_vectors[1:]
+
+
+    actions   = gt.get_player_actions(player)
+    info_sets = gt.get_player_info_sets(player)
+    n_info    = len(info_sets)
+
+    seq_weight_vectors = []
+
+    for seq in sequences:
+        swv = zeros((n_info,))
+
+
 def build_regret_matrices_seq_to_seq(game, player):
     # sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
     # info_sets = [1, 2, 3, 4]
-    gt = game.tree
+    gt        = game.tree
     sequences = gt.get_player_sequences(player)
     info_sets = gt.get_player_info_sets(player)
     n_info    = len(info_sets)
@@ -58,8 +138,11 @@ def build_regret_matrices_seq_to_seq(game, player):
     # To output: list of regret matrices
     phi_list  = [] 
     
+    print(sequences)
+
     for seq_from in sequences:
         for seq_to in sequences:
+
             # Want to construct a matrix *per* pure strategy sequence 
             phi = zeros((n_info, n_info))
             
@@ -73,7 +156,6 @@ def build_regret_matrices_seq_to_seq(game, player):
                 # Everything preceding first divergence should be the same;
                 # Ones on diagonal
                 ind_l = first_move_after_divergence(ind, seq_from) if (seq_from[ind] < seq_to[ind]) else ind
-
 
                 for i in range(ind_l):
                     phi[i,i] = 1
