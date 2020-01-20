@@ -74,17 +74,16 @@ def get_sequence_weight_vectors(game, player):
             last_player_inf[n] = 0
             
         if n.get_player() == player or n.is_leaf():
-            if n.get_information_set() not in inf_to_prefix.keys() or n.is_leaf():
 
-                if last_player_inf[n] == 0:
-                    inf_to_prefix[n.get_information_set()] = [0] * tup_len
+            if last_player_inf[n] == 0:
+                inf_to_prefix[n.get_information_set()] = [0] * tup_len
                 
-                else:
-                    tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
+            else:
+                tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
 
-                    tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
+                tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
 
-                    inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
+                inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
              
             if n.get_player() == player:
                 last_player_inf[n] = n.get_information_set()
