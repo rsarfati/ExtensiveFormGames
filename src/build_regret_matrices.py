@@ -151,6 +151,12 @@ def build_internal_regret_matrices_seq_to_seq(game, player):
     # sequences = [[1, 0, 0, 0], [0, 1, 1, 0], [0, 1, 0, 1]]
     sequences, inf_to_prefix, last_player_inf, last_player_move = get_sequence_weight_vectors(game, player, return_all=True)
     
+    def is_sibling(a, b): 
+        return last_player_inf[a] == last_player_inf[b]
+
+    def is_sibling_of_ancestor(a, b):
+        return None
+
     gt       = game.tree
     phi_size = len(sequences[1])
 
@@ -166,37 +172,43 @@ def build_internal_regret_matrices_seq_to_seq(game, player):
             # Want to construct a matrix *per* pure strategy sequence 
             phi = zeros((phi_size, phi_size))
             
-            # Find the index you start from, put probability in that cell
-            ind = find_first_divergence(seq_to, seq_from)
+            # # Find the index you start from, put probability in that cell
+            # ind = find_first_divergence(seq_to, seq_from)
             
-            # If sequences don't diverge, you return the identity!
-            if ind == -1:
-                phi_list.append(eye(phi_size, phi_size))
-            else:
-                # Everything preceding first divergence should be the same;
-                # Ones on diagonal
-                ind_l = first_move_after_divergence(ind, seq_from) if (seq_from[ind] < seq_to[ind]) else ind
+            # # If sequences don't diverge, you return the identity!
+            # if ind == -1:
+            #     phi_list.append(eye(phi_size, phi_size))
+            # else:
+            #     # Everything preceding first divergence should be the same;
+            #     # Ones on diagonal
+            #     ind_l = first_move_after_divergence(ind, seq_from) if (seq_from[ind] < seq_to[ind]) else ind
 
-                for i in range(ind_l):
-                    phi[i,i] = 1
+            #     for i in range(ind_l):
+            #         phi[i,i] = 1
 
-                # If they do diverge, we start at the first divergence
-                # and insert a column of the new sequence, there
-                #inf_div = info_dict[seq_from[ind]]
-                print(ind)
-                print("From: ", seq_from)
-                print("To:   ", seq_to)
+            #     # If they do diverge, we start at the first divergence
+            #     # and insert a column of the new sequence, there
+            #     #inf_div = info_dict[seq_from[ind]]
+            #     print(ind)
+            #     print("From: ", seq_from)
+            #     print("To:   ", seq_to)
 
 
                 
-                print(ind)
-                for i in range(ind, n_info):
-                    phi[i,ind_l] = seq_to[i]
+            #     print(ind)
+            #     for i in range(ind, n_info):
+            #         phi[i,ind_l] = seq_to[i]
                 
-                print(phi)
-                print()
+            #     print(phi)
+            #     print()
 
-                phi_list.append(phi)
+            for a in range(phi_size):
+                for b in range(phi_size):
+
+
+
+
+            phi_list.append(phi)
             
     return phi_list
 
