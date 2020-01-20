@@ -75,37 +75,48 @@ def get_sequence_weight_vectors(game, player):
             
         if n.get_player() == player or n.is_leaf():
 
+            # Base case: inf. set has no prefix of past player's action
             if last_player_inf[n] == 0:
                 inf_to_prefix[n.get_information_set()] = [0] * tup_len
                 
             else:
+                # Take prefix of actions getting to most recent inf. set of player
                 tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
 
+                # Put 1 in the position of past move getting to this inf. set
                 tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
 
+                # Set new prefix for this inf. set 
                 inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
-             
+            
+            # If player node, then future inf. sets should have this as "most recent"
             if n.get_player() == player:
                 last_player_inf[n] = n.get_information_set()
 
+            # Append the sequences terminating at leaves
             if n.is_leaf():
                 seq_weight_vectors.append(deepcopy(tup_new))
 
         for child in n.get_children():
 
+            # Inherit most recent player inf. set from parent
             last_player_inf[child] = deepcopy(last_player_inf[n])
             
             if n.get_player() == player:
+                # If current node is in player inf. set, most recent move is child id
                 last_player_move[child] = deepcopy(child.n_id)
-            
+
             elif last_player_inf[n] is not 0:
+                # If current node is not, inherit last player move from parent
                 last_player_move[child] = deepcopy(last_player_move[n])
-            
+
             else: 
+                # Base case: player has not yet moved
                 last_player_move[child] = 0
 
             Q.put(child)
 
+    # This convoluted expression just ensures uniqueness of entries
     return [list(x) for x in set(tuple(i) for i in seq_weight_vectors[1:])]
 
 
