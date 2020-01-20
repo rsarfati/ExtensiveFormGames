@@ -1,6 +1,7 @@
 # This file contains methods enabling the replication of Gordon and Greenwald (2008)
 from numpy import unique, zeros, eye
 from queue import Queue
+from copy import *
 
 def get_sequence_continuations(game, node):
     """
@@ -48,7 +49,7 @@ def get_sequence_weight_vectors(game, player):
     tup_len = 0
     print(inf_to_children.keys())
     for i in inf_to_children.keys():
-        inf_to_ind[i] = tup_len
+        inf_to_ind[i] = copy(tup_len)
         tup_len += inf_to_children[i]
 
     print("Tup Len ")
@@ -58,8 +59,8 @@ def get_sequence_weight_vectors(game, player):
     print(inf_to_ind)
 
     Q  = Queue()
-    inf_to_prefix = {} # maps information set to its prefix
-    inf_list      = {}
+    inf_to_prefix = {} # Maps information set to its prefix
+    inf_list      = {} # Maps information set to node (to keep track of visited)
 
     last_player_inf = {}
 
@@ -70,48 +71,44 @@ def get_sequence_weight_vectors(game, player):
 
     while not Q.empty():
         n = Q.get()
-
+        print("(" + str(n.get_player()) + ", " + str(n.get_information_set()) + ")")
         # If player's inf set did not precede it, set to 0
         if n not in last_player_inf.keys():
             last_player_inf[n] = 0
             
         if n.get_player() == player:
             if n.get_information_set() not in inf_to_prefix.keys():
+                
                 print("Information set: " + str(n.get_information_set()))
 
                 tup_new = [0]*tup_len
 
-                print(tup_new)
                 if gt.is_root(n):
-                    inf_to_prefix[n.get_information_set()] = tup_new
+                    print("ROOOOT")
+                    inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
                 else:
-                    print("Last player: " + str(last_player_inf[n]))
+                    print("Last player info set: " + str(last_player_inf[n]))
 
-                    tup_new = [0]*tup_len if last_player_inf[n] == 0 else inf_to_prefix[last_player_inf[n]]
+                    tup_new = [0]*tup_len if last_player_inf[n] == 0 else deepcopy(inf_to_prefix[last_player_inf[n]])
 
-                    print("Tuple init: " + str(tup_new))
-                    print("AAAAA")
+                    #print("Tuple init: " + str(tup_new))
+                    print("Inf to ind: " + str(inf_to_prefix[last_player_inf[n]]))
 
-                    print(n.get_information_set())
-
-                    print("BBBBB")
-
-                    print(inf_to_ind[n.get_information_set()])
-
-                    print("CCCCC")
                     tup_new[inf_to_ind[last_player_inf[n]] + n.n_id] = 1
-                    print(tup_new)
-                    inf_to_prefix[n.get_information_set()] = tup_new
+
+                    inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
                     # W/in inf set, actions should be same; don't double-count
                     
                 if n.is_leaf():
                     print("Appending: " + str(tup_new))
-                    seq_weight_vectors.append(tup_new)
+                    seq_weight_vectors.append(deepcopy(tup_new))
 
             last_player_inf[n] = n.get_information_set()
 
+        print(inf_to_prefix)
+
         for child in n.get_children():
-            last_player_inf[child] = last_player_inf[n]
+            last_player_inf[child] = deepcopy(last_player_inf[n])
             Q.put(child)
 
     return seq_weight_vectors[1:]
