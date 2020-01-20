@@ -63,6 +63,7 @@ def get_sequence_weight_vectors(game, player):
     inf_list      = {} # Maps information set to node (to keep track of visited)
 
     last_player_inf = {}
+    last_player_move = {}
 
     # Desired output:
     seq_weight_vectors = [[]]
@@ -72,6 +73,7 @@ def get_sequence_weight_vectors(game, player):
     while not Q.empty():
         n = Q.get()
         print("(" + str(n.get_player()) + ", " + str(n.get_information_set()) + ")")
+
         # If player's inf set did not precede it, set to 0
         if n not in last_player_inf.keys():
             last_player_inf[n] = 0
@@ -83,7 +85,7 @@ def get_sequence_weight_vectors(game, player):
 
                 tup_new = [0]*tup_len
 
-                if gt.is_root(n):
+                if gt.is_root(n) or last_player_inf[n] == 0:
                     print("ROOOOT")
                     inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
                 else:
@@ -91,10 +93,11 @@ def get_sequence_weight_vectors(game, player):
 
                     tup_new = [0]*tup_len if last_player_inf[n] == 0 else deepcopy(inf_to_prefix[last_player_inf[n]])
 
-                    #print("Tuple init: " + str(tup_new))
-                    print("Inf to ind: " + str(inf_to_prefix[last_player_inf[n]]))
-
-                    tup_new[inf_to_ind[last_player_inf[n]] + n.n_id] = 1
+                    print("Tuple init: " + str(tup_new))
+                    print("1: " + str(last_player_inf[n]))
+                    print("2: " + str(last_player_move[n]))
+                    print(inf_to_ind)
+                    tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
 
                     inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
                     # W/in inf set, actions should be same; don't double-count
@@ -105,23 +108,28 @@ def get_sequence_weight_vectors(game, player):
 
             last_player_inf[n] = n.get_information_set()
 
+        elif n.is_leaf():
+            tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
+            tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
+            seq_weight_vectors.append(deepcopy(tup_new))
+
         print(inf_to_prefix)
 
         for child in n.get_children():
             last_player_inf[child] = deepcopy(last_player_inf[n])
+            
+            if n.get_player() == player:
+                last_player_move[child] = deepcopy(child.n_id)
+            
+            elif last_player_inf[n] is not 0:
+                last_player_move[child] = deepcopy(last_player_move[n])
+            
+            else: 
+                last_player_move[child] = 0
+
             Q.put(child)
 
-    return seq_weight_vectors[1:]
-
-
-    actions   = gt.get_player_actions(player)
-    info_sets = gt.get_player_info_sets(player)
-    n_info    = len(info_sets)
-
-    seq_weight_vectors = []
-
-    for seq in sequences:
-        swv = zeros((n_info,))
+    return [list(x) for x in set(tuple(i) for i in seq_weight_vectors[1:])]
 
 
 def build_regret_matrices_seq_to_seq(game, player):

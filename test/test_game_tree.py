@@ -115,8 +115,9 @@ def simple_two_player_imp_info():
 		print('Player ' + str(p) + ':')
 		print(gt.get_player_info_sets(p))
 
-	print(get_sequence_weight_vectors(g, 1))
+	#print(get_sequence_weight_vectors(g, 1))
 	print(get_sequence_weight_vectors(g, 2))
+	throw(error())
 
 
 def get_tests():
