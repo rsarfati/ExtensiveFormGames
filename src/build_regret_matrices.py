@@ -44,78 +44,55 @@ def get_sequence_weight_vectors(game, player):
     gt = game.tree
 
     inf_to_children = gt.info_set_to_num_children(player)
-    inf_to_ind = {}
+    
+    inf_to_prefix = {} # Maps information set to its prefix
+    inf_list      = {} # Maps information set to node (to keep track of visited)
+    inf_to_ind    = {} # Maps information set to index in sq weight vec
+
+    last_player_inf  = {}
+    last_player_move = {}
 
     tup_len = 0
-    print(inf_to_children.keys())
+
     for i in inf_to_children.keys():
         inf_to_ind[i] = copy(tup_len)
         tup_len += inf_to_children[i]
 
-    print("Tup Len ")
-    print(tup_len)
-
-    print("Dict to ind")
-    print(inf_to_ind)
-
-    Q  = Queue()
-    inf_to_prefix = {} # Maps information set to its prefix
-    inf_list      = {} # Maps information set to node (to keep track of visited)
-
-    last_player_inf = {}
-    last_player_move = {}
-
     # Desired output:
     seq_weight_vectors = [[]]
 
+    Q  = Queue()
     Q.put(gt.root())
 
+    # Breadth-first search
     while not Q.empty():
         n = Q.get()
-        print("(" + str(n.get_player()) + ", " + str(n.get_information_set()) + ")")
 
         # If player's inf set did not precede it, set to 0
         if n not in last_player_inf.keys():
             last_player_inf[n] = 0
             
-        if n.get_player() == player:
-            if n.get_information_set() not in inf_to_prefix.keys():
+        if n.get_player() == player or n.is_leaf():
+            if n.get_information_set() not in inf_to_prefix.keys() or n.is_leaf():
+
+                if last_player_inf[n] == 0:
+                    inf_to_prefix[n.get_information_set()] = [0] * tup_len
                 
-                print("Information set: " + str(n.get_information_set()))
-
-                tup_new = [0]*tup_len
-
-                if gt.is_root(n) or last_player_inf[n] == 0:
-                    print("ROOOOT")
-                    inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
                 else:
-                    print("Last player info set: " + str(last_player_inf[n]))
+                    tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
 
-                    tup_new = [0]*tup_len if last_player_inf[n] == 0 else deepcopy(inf_to_prefix[last_player_inf[n]])
-
-                    print("Tuple init: " + str(tup_new))
-                    print("1: " + str(last_player_inf[n]))
-                    print("2: " + str(last_player_move[n]))
-                    print(inf_to_ind)
                     tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
 
                     inf_to_prefix[n.get_information_set()] = deepcopy(tup_new)
-                    # W/in inf set, actions should be same; don't double-count
-                    
-                if n.is_leaf():
-                    print("Appending: " + str(tup_new))
-                    seq_weight_vectors.append(deepcopy(tup_new))
+             
+            if n.get_player() == player:
+                last_player_inf[n] = n.get_information_set()
 
-            last_player_inf[n] = n.get_information_set()
-
-        elif n.is_leaf():
-            tup_new = deepcopy(inf_to_prefix[last_player_inf[n]])
-            tup_new[inf_to_ind[last_player_inf[n]] + last_player_move[n]] = 1
-            seq_weight_vectors.append(deepcopy(tup_new))
-
-        print(inf_to_prefix)
+            if n.is_leaf():
+                seq_weight_vectors.append(deepcopy(tup_new))
 
         for child in n.get_children():
+            
             last_player_inf[child] = deepcopy(last_player_inf[n])
             
             if n.get_player() == player:
