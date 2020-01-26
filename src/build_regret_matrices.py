@@ -205,6 +205,7 @@ def build_internal_regret_matrices_seq_to_seq(game, player):
             for a in range(phi_size):
                 for b in range(phi_size):
 
+                    phi[a][b] = seq_to[a] if ()  else (1 if (a == b and ) else 0)
 
 
 
