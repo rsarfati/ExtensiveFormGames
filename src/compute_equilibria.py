@@ -2,14 +2,31 @@ from numpy import unique, zeros, eye
 from queue import Queue
 from copy import *
 
-def recur_decorate(game, n, visited, p_ih, q_ih):
+def recur_decorate(game, n, visited, p_i, q_i):
 	visited[n] = True # Mark as visited
 
-	# Do whatever it is you wanted to do
-	p_ih[n] = 
+	q_i[(h, n)] = 1.0 / float(len(n.get_children()))
 
-	
 	for child in n.get_children():
+
+		p_i[(n, child)] = 1.0 / float(len(n.get_children()))
+
+		if child not in visited.keys():
+			visited = recur_decorate(game, child, visited)
+
+	return visited
+
+def decorate_q(game):
+
+def recur_decorate_q(game, q_i): 
+	visited[n] = True 
+
+	q_i[(h, n)] = 1.0 / float(len(n.get_children()))
+
+	for child in n.get_children():
+
+		p_i[(n, child)] = 1.0 / float(len(n.get_children()))
+
 		if child not in visited.keys():
 			visited = recur_decorate(game, child, visited)
 
@@ -23,8 +40,8 @@ def initialize_tree(game):
     uniform, and correspondingly the probabilities of states within
     information sets to be uniform.
 	"""
-	q_ih = {} # Maps INFORMATION SETS to probabilities over states
-	p_ih = {} # Maps INFORMATION SETS to probabilities over actions
+	q_ih = {}    # Maps INFORMATION SETS to probabilities over states
+	p_ih = {}    # Maps INFORMATION SETS to probabilities over actions
 	visited = {} # Maps NODES to boolean of whether yet initialized
 
 	Q  = Queue()
