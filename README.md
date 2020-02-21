@@ -12,7 +12,7 @@
   * Perturbed Follow-the-Leader
   * Regularized Follow-the-Leader 
 
-## Coming Soon in Feb. 2020
+## ~~Coming Soon in Feb. 2020~~ TBD
 + Compute correlated equilibria using counterfactual regret minimization algorithms
 
 ## Reference Papers
